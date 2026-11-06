@@ -1,0 +1,22 @@
+name: elegant_taxi
+description: Elegant Driver - Haydovchi Taksometri
+publish_to: 'none'
+version: 5.3.0+1
+
+environment:
+  sdk: '>=3.0.0 <4.0.0'
+
+dependencies:
+  flutter:
+    sdk: flutter
+  cupertino_icons: ^1.0.6
+  geolocator: ^10.1.0
+  yandex_mapkit: ^3.4.0
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  flutter_lints: ^3.0.0
+
+flutter:
+  uses-material-design: true
