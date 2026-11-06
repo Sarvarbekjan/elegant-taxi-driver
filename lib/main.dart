@@ -1,6 +1,5 @@
 // ============================================================================
-// ELEGANT DRIVER - HAYDOVCHI TAKSOMETRI (DRIVER APP v5.3) - 1-QISM
-// YANDEX PRO STYLE RADAR RINGTONE + LIVE GPS TAXOMETER + FIREBASE CLOUD
+// ELEGANT DRIVER - HAYDOVCHI TAKSOMETRI (DRIVER APP v5.3) - TO'LIQ KOD (XATOSIZ)
 // ============================================================================
 import 'dart:async';
 import 'dart:convert';
@@ -44,7 +43,7 @@ class DriverStrings {
       "skip_btn": "O'tkazib yuborish",
       "arrived_btn": "MANZILGA YETIB KELDIM",
       "start_trip_btn": "SAFARNI BOSHLASH (TAKSOMETR)",
-      "finish_trip_btn": "SAFARNI YAKUNLASH",
+      "finish_trip_btn": "SAFARni YAKUNLASH",
       "transfer_order": "Boshqa haydovchiga o'tkazish",
       "wait_free": "Bepul kutish",
       "wait_paid": "Pullik kutish",
@@ -54,6 +53,7 @@ class DriverStrings {
       "open_dest_badge": "Manzilni mijoz aytadi (Taksometr)",
       "call_client": "Mijozga qo'ng'iroq",
       "chat_client": "Mijoz bilan chat",
+      "save_btn": "SAQLASH",
     },
     "Русский": {
       "online": "На линии (Свободен)",
@@ -81,6 +81,7 @@ class DriverStrings {
       "open_dest_badge": "Адрес скажет клиент (По таксометру)",
       "call_client": "Позвонить клиенту",
       "chat_client": "Чат с клиентом",
+      "save_btn": "СОХРАНИТЬ",
     },
   };
 
@@ -91,7 +92,7 @@ class DriverStrings {
 }
 
 class ChatMessage {
-  final String sender; // 'client' or 'driver'
+  final String sender;
   final String text;
   final String time;
 
@@ -246,7 +247,6 @@ class DriverAppState extends ChangeNotifier {
   Timer? _syncTimer;
   bool _isSyncing = false;
 
-  // Tarif va komissiya sozlamalari (Firebase orqali Admin boshqaradi)
   int stdBase = 4000;
   int stdPerKm = 2000;
   int comfBase = 5000;
@@ -261,7 +261,6 @@ class DriverAppState extends ChangeNotifier {
   double surgeMultiplier = 1.0;
   String currencyLabel = "so'm";
 
-  // Haydovchi profil ma'lumotlari
   bool isAuthenticated = false;
   String driverId = "DRV-101";
   String driverName = "";
@@ -473,7 +472,6 @@ class DriverAppState extends ChangeNotifier {
             currencyLabel = cfg['currencyLabel']?.toString() ?? currencyLabel;
           }
 
-          // Admin haydovchi balansini to'ldirgan yoki bloklagan bo'lsa yangilaymiz
           if (isAuthenticated && root['drivers'] is Map) {
             final dMap = Map<String, dynamic>.from(root['drivers']);
             if (dMap[driverId] is Map) {
@@ -496,7 +494,6 @@ class DriverAppState extends ChangeNotifier {
                 .toList();
             cloudOrders.sort((a, b) => b.createdAt.compareTo(a.createdAt));
 
-            // Mijozdan yangi chat xabari kelganini tekshirish
             for (final co in cloudOrders) {
               final prevCnt = knownMsgCounts[co.id] ?? co.messages.length;
               if (co.driverId == driverId && co.messages.length > prevCnt && !isInitial) {
@@ -657,7 +654,13 @@ class DriverAppState extends ChangeNotifier {
     notifyListeners();
   }
 
-  Future> completeTripAndDeductCommission(OrderModel ord, {required double finalKm, required int finalPrice, required int finalWaitFee, required int waitSec}) async {
+  Future> completeTripAndDeductCommission(
+    OrderModel ord, {
+    required double finalKm,
+    required int finalPrice,
+    required int finalWaitFee,
+    required int waitSec,
+  }) async {
     final int totalAmount = finalPrice + finalWaitFee;
     final int commission = ((totalAmount * commissionPercent) / 100).round();
 
@@ -756,9 +759,6 @@ class ElegantDriverApp extends StatelessWidget {
   }
 }
 
-// ============================================================================
-// HAYDOVCHI RO'YXATDAN O'TISH VA AVTOMOBIL KARTASI KIRISH EKRANI
-// ============================================================================
 class DriverAuthScreen extends StatefulWidget {
   const DriverAuthScreen({super.key});
   @override
@@ -897,7 +897,7 @@ class _DriverAuthScreenState extends State<DriverAuthScreen> {
                         textCapitalization: TextCapitalization.characters,
                         decoration: InputDecoration(
                           labelText: "Davlat raqami (75 A 777 AA)",
-                          prefixIcon: const Icon(Icons.Confirmation_number_outlined, color: kPrimaryGreen),
+                          prefixIcon: const Icon(Icons.confirmation_number_outlined, color: kPrimaryGreen),
                           border: OutlineInputBorder(borderRadius: BorderRadius.circular(14)),
                         ),
                       ),
@@ -946,11 +946,6 @@ class _DriverAuthScreenState extends State<DriverAuthScreen> {
     );
   }
 }
-// === 1-QISM TUGADI. SHU YERDAN PASTGA 2-QISMNI QO'SHING ===
-// ============================================================================
-// ELEGANT DRIVER - HAYDOVCHI TAKSOMETRI (DRIVER APP v5.3) - 2-QISM (YAKUNIY)
-// JONLI YANDEX XARITA + GPS TAKSOMETR + ZAKAZ RADARI + DAROMAD VA HISOBOT
-// ============================================================================
 
 class DriverMainScaffold extends StatefulWidget {
   const DriverMainScaffold({super.key});
@@ -970,7 +965,7 @@ class _DriverMainScaffoldState extends State<DriverMainScaffold> with WidgetsBin
 
   double _liveDrivenKm = 0.0;
   int _tripElapsedSeconds = 0;
-  int _freeWaitSecondsLeft = 180; // 3 daqiqa bepul kutish
+  int _freeWaitSecondsLeft = 180;
   int _paidWaitSeconds = 0;
   bool _isPausedForWaiting = false;
   Point? _lastTrackPoint;
@@ -1328,7 +1323,6 @@ class _DriverMainScaffoldState extends State<DriverMainScaffold> with WidgetsBin
                 ),
               ),
 
-              // Yuqori boshqaruv paneli: Menyu + Liniya statusi + Balans
               Positioned(
                 top: MediaQuery.of(context).padding.top + 10,
                 left: 12,
@@ -1414,7 +1408,6 @@ class _DriverMainScaffoldState extends State<DriverMainScaffold> with WidgetsBin
                 ),
               ),
 
-              // Balans minimal chegaradan past bo'lsa qizil ogohlantirish
               if (!driverState.hasEnoughBalance)
                 Positioned(
                   top: MediaQuery.of(context).padding.top + 64,
@@ -1447,7 +1440,6 @@ class _DriverMainScaffoldState extends State<DriverMainScaffold> with WidgetsBin
                   ),
                 ),
 
-              // O'ng burchakdagi Mening joylashuvim (GPS) tugmasi
               Positioned(
                 right: 14,
                 bottom: activeOrd != null ? 320 : 250,
@@ -1459,7 +1451,6 @@ class _DriverMainScaffoldState extends State<DriverMainScaffold> with WidgetsBin
                 ),
               ),
 
-              // Pastki asosiy Taksometr yoki Zakaz Radari oynasi
               Positioned(
                 left: 0,
                 right: 0,
@@ -1652,7 +1643,6 @@ class _DriverMainScaffoldState extends State<DriverMainScaffold> with WidgetsBin
     );
   }
 
-  // YANGI ZAKAZ TUSHGANDA JIRINGLAYDIGAN RADAR KARTASI
   Widget _buildIncomingOrderRadarCard(OrderModel ord, int totalWaitingCount, bool dark) {
     final double pickupDistKm = _calcDistanceKm(driverState.currentGps, ord.fromPoint);
     return Column(
@@ -1811,7 +1801,6 @@ class _DriverMainScaffoldState extends State<DriverMainScaffold> with WidgetsBin
     );
   }
 
-  // QABUL QILINGAN BUYURTMA VA JONLI GPS TAKSOMETR EKRANI
   Widget _buildActiveTaxometerPanel(OrderModel ord, bool dark) {
     final String st = ord.status;
     final int currentTotal = ord.price + ord.waitFee;
@@ -1875,7 +1864,6 @@ class _DriverMainScaffoldState extends State<DriverMainScaffold> with WidgetsBin
           ),
         const SizedBox(height: 10),
 
-        // KUTISH TAYMERI YOKI JONLI TAKSOMETR TABLOSI
         if (st == 'Yetib keldi')
           Container(
             width: double.infinity,
@@ -1965,7 +1953,6 @@ class _DriverMainScaffoldState extends State<DriverMainScaffold> with WidgetsBin
 
         const SizedBox(height: 10),
 
-        // Mijozga Qo'ng'iroq va Jonli Chat tugmalari
         Row(
           children: [
             Expanded(
